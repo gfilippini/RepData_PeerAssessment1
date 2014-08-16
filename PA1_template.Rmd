@@ -28,11 +28,11 @@ ggplot(activity_noNA, aes(date, steps)) + geom_bar(stat = "identity", colour = "
 totalstepsperday<-aggregate(activity_noNA$steps, list(Date=activity_noNA$date), FUN = "sum")$x
 ```
 Mean
-```{r, echo=FALSE}
+```{r calculate mean}
 mean(totalstepsperday)
 ```
 Median
-```{r, echo=FALSE}
+```{r calculate median}
 median(totalstepsperday)
 ```
 
@@ -42,10 +42,16 @@ median(totalstepsperday)
 
 #### 1. Make a time series plot of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days(y-axis)
 
-
+```{r Average steps by interval}
+stepsbyinterval<- aggregate(activity_noNA$steps, list(interval = as.numeric(as.character(activity_noNA$interval))), FUN = "mean")
+plot(stepsbyinterval$interval,stepsbyinterval$x,type='l',main="Average steps by 5-minute interval",xlab="5-minute interval",ylab="average steps")
+```
 
 #### 2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
+```{r 5-minute interval with more steps}
+stepsbyinterval[stepsbyinterval$x==max(stepsbyinterval$x),]$interval
+```
 
 ## Imputing missing values
 
