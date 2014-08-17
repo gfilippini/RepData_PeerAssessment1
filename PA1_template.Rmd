@@ -1,7 +1,25 @@
-# Reproducible Research: Peer Assessment 1
+---
+title: "Peer Assessment 1"
+author: "Giuliano Filippini"
+date: "Tuesday, August 12, 2014"
+output: html_document
+---
 
+### Getting started
+This code is a study for Peer Assessment 1 on Reproducible Research Coursera course.
+
+First, we do some basic settings, so is possible to process the document.
+```{r Basic settings}
+## turn off scientific notations
+options(scipen=1)
+## some libraries are needed for plots
+library(lattice)
+library(ggplot2)
+```
 
 ### Loading and preprocessing the data
+This chunk of code load the data and meke some processes to make data more usefull for the first analysis.
+
 ```{r this section unzips and upload the data}
 unzip('activity.zip')
 activity<-read.csv('activity.csv', colClasses=c("integer","Date","factor"))
@@ -9,7 +27,6 @@ activity$month <-as.numeric(format(activity$date,"%m"))
 ## excludes NA values
 activity_noNA<-na.omit(activity)
 rownames(activity_noNA)<-1:nrow(activity_noNA)
-library(ggplot2)
 ```
 
 ### What is mean total number of steps taken per day?
@@ -27,14 +44,20 @@ ggplot(activity_noNA, aes(date, steps)) + geom_bar(stat = "identity", colour = "
 ## it is needed to use a funcion to sum the total number of steps taken each day
 totalstepsperday<-aggregate(activity_noNA$steps, list(Date=activity_noNA$date), FUN = "sum")$x
 ```
+
+
 Mean
 ```{r calculate mean}
-mean(totalstepsperday)
+m<-mean(totalstepsperday)
 ```
+The mean is **`r m`**.
+
+
 Median
 ```{r calculate median}
-median(totalstepsperday)
+med<-median(totalstepsperday)
 ```
+The median is **`r med`**.
 
 
 
@@ -50,20 +73,23 @@ plot(stepsbyinterval$interval,stepsbyinterval$x,type='l',main="2. Average steps 
 #### 2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
 ```{r 5-minute interval with more steps}
-stepsbyinterval[stepsbyinterval$x==max(stepsbyinterval$x),]$interval
+sint<-stepsbyinterval[stepsbyinterval$x==max(stepsbyinterval$x),]$interval
+steps<-stepsbyinterval[stepsbyinterval$x==max(stepsbyinterval$x),]$x
 ```
+The 5-minute interval with the maximum number of steps is `r sint` with `r steps` steps on average.
 
 ### Imputing missing values
 
 #### 1. Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)
 
 ```{r Count NAs}
-sum(is.na(activity$steps))
+na<-sum(is.na(activity$steps))
 ```
+The total number os missing values in the dataset is <b>`r na`</b>.
 
 #### 2. Devise a strategy for filling in all the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or mean for that 5-minute interval, etc.
 
-The strategy is to input the median on 5-minute interval
+The strategy is to input the median of each 5-minute interval
 
 ```{r taking median steps by 5-minute interval}
 mediansteps<- aggregate(activity_noNA$steps, list(interval = as.numeric(as.character(activity_noNA$interval))), FUN = "median")
@@ -93,16 +119,23 @@ ggplot(activityNew, aes(date, steps)) + geom_bar(stat = "identity", colour = "da
 ## it is needed to use a funcion to sum the total number of steps taken each day
 totalsteps<-aggregate(activityNew$steps, list(Date=activityNew$date), FUN = "sum")$x
 ```
+
+
 Mean
 ```{r calculate mean on new data}
-mean(totalsteps)
+mnew<-mean(totalsteps)
 ```
+The new mean is **`r mnew`**.
+
+
 Median
 ```{r calculate median on new data}
-median(totalsteps)
+mednew<-median(totalsteps)
 ```
+The new median is **`r mednew`**.
 
-As we can see from the mean and the median. Since more low values were inputed for each day, the values were lower than when missings were ignored. But the differences are not so huge.
+
+We can see from the mean and the median that since more low values were inputed for each day, the values were lower than when missings were ignored. But the differences are not so huge.
 
 ### Are there differences in activity patterns between weekdays and weekends?
 
@@ -117,8 +150,6 @@ activityNew$weektime<-as.factor(ifelse(weekdays(activityNew$date,abbreviate=T) %
 ```{r calculate the mean by interval and factors}
 ## calculate mean by interval and factors
  meanSteps<- aggregate(activityNew$steps,list(interval=as.numeric(as.character(activityNew$interval)),weektime=activityNew$weektime),FUN="mean")
-## lattice library is needed for this plot
-library(lattice)
 ## ploting the panels
 xyplot(meanSteps$x~meanSteps$interval|factor(meanSteps$weektime),type='l',layout=c(1,2),xlab="5-minute interval",ylab="4. Average number of steps",main="Average number of steps taken each day \nweekend x weekday")
 ```
