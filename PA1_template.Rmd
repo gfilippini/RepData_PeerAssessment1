@@ -44,7 +44,7 @@ median(totalstepsperday)
 
 ```{r Average steps by interval}
 stepsbyinterval<- aggregate(activity_noNA$steps, list(interval = as.numeric(as.character(activity_noNA$interval))), FUN = "mean")
-plot(stepsbyinterval$interval,stepsbyinterval$x,type='l',main="Average steps by 5-minute interval",xlab="5-minute interval",ylab="average steps")
+plot(stepsbyinterval$interval,stepsbyinterval$x,type='l',main="2. Average steps by 5-minute interval",xlab="5-minute interval",ylab="average steps")
 ```
 
 #### 2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
@@ -86,7 +86,7 @@ for (row in 1:nrow(activityNew)){
 
 ```{r makes the plot and calculates the mean on inputed data}
 ## makes the plot
-ggplot(activityNew, aes(date, steps)) + geom_bar(stat = "identity", colour = "darkgreen" , fill = "darkgreen", width = 0.7) + facet_grid(. ~ month, scales = "free") + labs(title = "4.Histogram of Total Number of Steps Taken Each Day", x = "Date", y = "Number of steps")
+ggplot(activityNew, aes(date, steps)) + geom_bar(stat = "identity", colour = "darkgreen" , fill = "darkgreen", width = 0.7) + facet_grid(. ~ month, scales = "free") + labs(title = "3.Histogram of Total Number of Steps Taken Each Day \n inputed data", x = "Date", y = "Number of steps")
 ```
 
 ```{r processes the database to calculate the means on new data}
@@ -104,4 +104,22 @@ median(totalsteps)
 
 As we can see from the mean and the median. Since more low values were inputed for each day, the values were lower than when missings were ignored. But the differences are not so huge.
 
-## Are there differences in activity patterns between weekdays and weekends?
+### Are there differences in activity patterns between weekdays and weekends?
+
+#### 1. Create a new factor variable in the dataset with two levels "weekday" and "weekend" indicating whether a given date is a weekday or a weekend day.
+
+```{r new factor variable weektime}
+activityNew$weektime<-as.factor(ifelse(weekdays(activityNew$date,abbreviate=T) %in% c('sáb','dom'),"weekend","weekday"))
+```
+
+#### 2. Make a panel plot containing a time series plot of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days (y-axis).
+
+```{r calculate the mean by interval and factors}
+## calculate mean by interval and factors
+ meanSteps<- aggregate(activityNew$steps,list(interval=as.numeric(as.character(activityNew$interval)),weektime=activityNew$weektime),FUN="mean")
+## lattice library is needed for this plot
+library(lattice)
+## ploting the panels
+xyplot(meanSteps$x~meanSteps$interval|factor(meanSteps$weektime),type='l',layout=c(1,2),xlab="5-minute interval",ylab="4. Average number of steps",main="Average number of steps taken each day \nweekend x weekday")
+```
+ 
